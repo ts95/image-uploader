@@ -69,10 +69,16 @@
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <menu id="6AE-dk-bGL">
                     <items>
-                        <menuItem title="Quit" id="ETD-lW-GTG">
+                        <menuItem title="Active" state="on" tag="1" toolTip="Uploads if active" id="ETD-lW-GTG">
                             <modifierMask key="keyEquivalentModifierMask"/>
                             <connections>
-                                <action selector="quitClicked:" target="Voe-Tx-rLC" id="ZC5-9x-jTs"/>
+                                <action selector="activeClicked:" target="Voe-Tx-rLC" id="wOg-Kf-XxA"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Quit" id="bdJ-pq-3RT">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="quitClicked:" target="Voe-Tx-rLC" id="UtA-49-7vb"/>
                             </connections>
                         </menuItem>
                     </items>

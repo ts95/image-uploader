@@ -21,6 +21,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     let detector = ScreenshotDetector()
     let uploader = ImgServiceUploader()
     
+    var imageUploadEnabled: Bool {
+        get {
+            return statusMenu.itemWithTag(1)!.state == NSOnState
+        }
+    }
+    
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         defaultIcon.template = true
         loadingIcon.template = false
@@ -74,7 +80,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApplication.sharedApplication().terminate(self)
     }
     
+    @IBAction func activeClicked(sender: NSMenuItem) {
+        if sender.state == NSOnState {
+            sender.state = NSOffState
+        } else {
+            sender.state = NSOnState
+        }
+    }
+    
     func uploadImage(url: NSURL, deleteFile: Bool = false) {
+        if !imageUploadEnabled {
+            return
+        }
+        
         statusItem.image = loadingIcon
         
         uploader

@@ -10,7 +10,7 @@
 		295F140D1BFA4C3D00BC2197 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295F140C1BFA4C3D00BC2197 /* Errors.swift */; };
 		296A61551BFA24AF006BEA3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61541BFA24AF006BEA3D /* AppDelegate.swift */; };
 		296A61591BFA24AF006BEA3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 296A61581BFA24AF006BEA3D /* Assets.xcassets */; };
-		296A615C1BFA24AF006BEA3D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 296A615A1BFA24AF006BEA3D /* Main.storyboard */; };
+		296A615C1BFA24AF006BEA3D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 296A615A1BFA24AF006BEA3D /* Main.storyboard */; settings = {ASSET_TAGS = (menuItemActive, ); }; };
 		296A61671BFA24AF006BEA3D /* Image_uploaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61661BFA24AF006BEA3D /* Image_uploaderTests.swift */; };
 		296A61721BFA24AF006BEA3D /* Image_uploaderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61711BFA24AF006BEA3D /* Image_uploaderUITests.swift */; };
 		296A61801BFA24E1006BEA3D /* Uploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A617F1BFA24E1006BEA3D /* Uploader.swift */; };
@@ -220,6 +220,9 @@
 		296A61491BFA24AF006BEA3D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					menuItemActive,
+				);
 				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Toni Sučić";
