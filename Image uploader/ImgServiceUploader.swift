@@ -10,9 +10,7 @@ import Foundation
 import BrightFutures
 import Alamofire
 
-// Implementation for https://github.com/ts95/img-service
-
-class ImgServiceUploader: UploaderProtocol {
+class ImgServiceUploader {
     
     let passcodeData = NSData(contentsOfURL: NSURL(fileURLWithPath: "/Users/tonisucic/passcode"))!
     

@@ -13,7 +13,6 @@
 		296A615C1BFA24AF006BEA3D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 296A615A1BFA24AF006BEA3D /* Main.storyboard */; settings = {ASSET_TAGS = (menuItemActive, ); }; };
 		296A61671BFA24AF006BEA3D /* Image_uploaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61661BFA24AF006BEA3D /* Image_uploaderTests.swift */; };
 		296A61721BFA24AF006BEA3D /* Image_uploaderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61711BFA24AF006BEA3D /* Image_uploaderUITests.swift */; };
-		296A61801BFA24E1006BEA3D /* Uploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A617F1BFA24E1006BEA3D /* Uploader.swift */; };
 		296A61821BFA261F006BEA3D /* ImgServiceUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A61811BFA261F006BEA3D /* ImgServiceUploader.swift */; };
 		29CD362D1BFADD180032EC5A /* ScreenshotDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CD362C1BFADD180032EC5A /* ScreenshotDetector.swift */; };
 		CCDA59FCA22F80F50408C71B /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3A4D806FCE97671F61AD4F8 /* Pods.framework */; };
@@ -49,7 +48,6 @@
 		296A616D1BFA24AF006BEA3D /* Image uploaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Image uploaderUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		296A61711BFA24AF006BEA3D /* Image_uploaderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image_uploaderUITests.swift; sourceTree = "<group>"; };
 		296A61731BFA24AF006BEA3D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		296A617F1BFA24E1006BEA3D /* Uploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Uploader.swift; sourceTree = "<group>"; };
 		296A61811BFA261F006BEA3D /* ImgServiceUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImgServiceUploader.swift; sourceTree = "<group>"; };
 		29CD362C1BFADD180032EC5A /* ScreenshotDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotDetector.swift; sourceTree = "<group>"; };
 		76F954FFD04CB12ABAD144E4 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -129,7 +127,6 @@
 				296A61581BFA24AF006BEA3D /* Assets.xcassets */,
 				296A615A1BFA24AF006BEA3D /* Main.storyboard */,
 				296A615D1BFA24AF006BEA3D /* Info.plist */,
-				296A617F1BFA24E1006BEA3D /* Uploader.swift */,
 				296A61811BFA261F006BEA3D /* ImgServiceUploader.swift */,
 				295F140C1BFA4C3D00BC2197 /* Errors.swift */,
 				29CD362C1BFADD180032EC5A /* ScreenshotDetector.swift */,
@@ -339,7 +336,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				296A61801BFA24E1006BEA3D /* Uploader.swift in Sources */,
 				29CD362D1BFADD180032EC5A /* ScreenshotDetector.swift in Sources */,
 				295F140D1BFA4C3D00BC2197 /* Errors.swift in Sources */,
 				296A61821BFA261F006BEA3D /* ImgServiceUploader.swift in Sources */,

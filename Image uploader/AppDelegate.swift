@@ -7,6 +7,24 @@
 //
 
 import Cocoa
+import BrightFutures
+
+func shell(input: String) -> (output: String, exitCode: Int32) {
+    let task = NSTask()
+    task.arguments = ["-c", input]
+    task.launchPath = "/bin/bash"
+    
+    let pipe = NSPipe()
+    task.standardOutput = pipe
+    task.launch()
+    task.waitUntilExit()
+    
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output: String = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
+    
+    return (output, task.terminationStatus)
+}
+
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
@@ -41,7 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self.uploadImage(fileURL, deleteFile: true)
         }
     }
-
+    
     func applicationWillTerminate(aNotification: NSNotification) {
         // ...
     }
@@ -51,7 +69,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func performDragOperation(sender: NSDraggingInfo) -> Bool {
-        let supportedExtensions = [".gif", ".jpeg", ".jpg", ".png", ".webm"]
+        var supportedExtensions = [".gif", ".jpeg", ".jpg", ".png", ".webm", ".mp4"]
+        
+        if hasFfmpeg() {
+            supportedExtensions.append(".mov")
+        }
+        
         let pasteboard = sender.draggingPasteboard()
         
         if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
@@ -65,7 +88,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 .filter { supportedExtension in filename.hasSuffix(supportedExtension) }
                 .count == 1
             
-            if isValid {
+            if isValid && filename.hasSuffix(".mov") {
+                let url = NSURL(fileURLWithPath: filename, isDirectory: false)
+                uploadImage(url, deleteFile: true)
+            } else if isValid {
                 let url = NSURL(fileURLWithPath: filename, isDirectory: false)
                 uploadImage(url)
             }
@@ -89,28 +115,50 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func uploadImage(url: NSURL, deleteFile: Bool = false) {
+        if statusItem.image == loadingIcon {
+            let notification = NSUserNotification()
+            notification.title = "Image uploader"
+            notification.informativeText = "An upload is already in progress. Wait for it to finish."
+            notification.soundName = NSUserNotificationDefaultSoundName
+            NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+            return
+        }
+        
         if !imageUploadEnabled {
             return
         }
         
         statusItem.image = loadingIcon
         
-        uploader
-            .uploadFile(url)
-            .onSuccess(callback: { linkToImage in
-                if deleteFile {
-                    let fileManager = NSFileManager.defaultManager()
-                    try! fileManager.removeItemAtURL(url)
-                }
-                
-                let onlineURL = NSURL(string: linkToImage)!
-                
-                let pasteboard = NSPasteboard.generalPasteboard()
-                pasteboard.clearContents()
-                //pasteboard.setData(NSData(contentsOfURL: onlineURL), forType: NSPasteboardTypePNG)
-                pasteboard.setString(linkToImage, forType: NSPasteboardTypeString)
-                
-                NSWorkspace.sharedWorkspace().openURL(onlineURL)
+        var urlFuture: Future<NSURL, NoError>
+        
+        if url.pathExtension! == "mov" {
+            urlFuture = getCompressedMP4File(forMovFilePath: url.path!)
+                .map({ filePath in NSURL(fileURLWithPath: filePath) })
+        } else {
+            urlFuture = Future<NSURL, NoError>(value: url)
+        }
+        
+        urlFuture
+            .onSuccess(callback: { uploadURL in
+                return self.uploader.uploadFile(uploadURL)
+            })
+            .onSuccess(callback: { uploadURL in
+                return self.uploader.uploadFile(uploadURL)
+                    .onSuccess(callback: { linkToImage in
+                        if deleteFile {
+                            let fileManager = NSFileManager.defaultManager()
+                            try! fileManager.removeItemAtURL(uploadURL)
+                        }
+                        
+                        let onlineURL = NSURL(string: linkToImage)!
+                        
+                        let pasteboard = NSPasteboard.generalPasteboard()
+                        pasteboard.clearContents()
+                        pasteboard.setString(linkToImage, forType: NSPasteboardTypeString)
+                        
+                        NSWorkspace.sharedWorkspace().openURL(onlineURL)
+                    })
             })
             .onFailure(callback: { err in
                 print(err)
@@ -125,5 +173,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.statusItem.image = self.defaultIcon
             })
     }
-
+    
+    func hasFfmpeg() -> Bool {
+        let (output, exitCode) = shell("/usr/local/bin/brew list | grep ffmpeg")
+        if exitCode == EXIT_FAILURE {
+            return false
+        }
+        return output.containsString("ffmpeg")
+    }
+    
+    func getCompressedMP4File(forMovFilePath movFilePath: String) -> Future<String, NoError> {
+        let promise = Promise<String, NoError>()
+        
+        Queue.global.async {
+            let path = movFilePath.stringByReplacingOccurrencesOfString(" ", withString: "\\ ")
+            
+            shell("/usr/local/bin/ffmpeg -i \(path) -vcodec copy -acodec copy \(path).mp4")
+            shell("/usr/local/bin/ffmpeg -i \(path).mp4 -vcodec libx264 -crf 35 \(path).compressed.mp4")
+            shell("rm \(path).mp4")
+            
+            promise.success("\(movFilePath).compressed.mp4")
+        }
+        
+        return promise.future
+    }
 }
