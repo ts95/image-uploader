@@ -13,7 +13,7 @@ func shell(input: String) -> (output: String, exitCode: Int32) {
     let task = NSTask()
     task.arguments = ["-c", input]
     task.launchPath = "/bin/bash"
-    
+
     let pipe = NSPipe()
     task.standardOutput = pipe
     task.launch()
@@ -141,10 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         urlFuture
             .onSuccess(callback: { uploadURL in
-                return self.uploader.uploadFile(uploadURL)
-            })
-            .onSuccess(callback: { uploadURL in
-                return self.uploader.uploadFile(uploadURL)
+                self.uploader.uploadFile(uploadURL)
                     .onSuccess(callback: { linkToImage in
                         if deleteFile {
                             let fileManager = NSFileManager.defaultManager()
@@ -159,18 +156,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                         
                         NSWorkspace.sharedWorkspace().openURL(onlineURL)
                     })
-            })
-            .onFailure(callback: { err in
-                print(err)
-                
-                let notification = NSUserNotification()
-                notification.title = "Image uploader"
-                notification.informativeText = "An error ocurred when uploading the image."
-                notification.soundName = NSUserNotificationDefaultSoundName
-                NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
-            })
-            .onComplete(callback: { _ in
-                self.statusItem.image = self.defaultIcon
+                    .onFailure(callback: { err in
+                        print(err)
+                        
+                        let notification = NSUserNotification()
+                        notification.title = "Image uploader"
+                        notification.informativeText = "An error ocurred when uploading the image."
+                        notification.soundName = NSUserNotificationDefaultSoundName
+                        NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+                    })
+                    .onComplete(callback: { _ in
+                        self.statusItem.image = self.defaultIcon
+                    })
             })
     }
     
@@ -186,13 +183,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let promise = Promise<String, NoError>()
         
         Queue.global.async {
-            let path = movFilePath.stringByReplacingOccurrencesOfString(" ", withString: "\\ ")
+            let nMovFilePath = movFilePath.stringByReplacingOccurrencesOfString(" ", withString: "\\ ")
+            let tmpName = NSString(string: "~/.\(NSDate().timeIntervalSince1970)").stringByStandardizingPath
+
+            shell("/usr/local/bin/ffmpeg -i \(nMovFilePath) -vcodec copy -acodec copy \(tmpName).mp4")
+            shell("/usr/local/bin/ffmpeg -i \(tmpName).mp4 -vcodec libx264 -crf 35 \(tmpName).compressed.mp4")
+            shell("rm \(tmpName).mp4")
             
-            shell("/usr/local/bin/ffmpeg -i \(path) -vcodec copy -acodec copy \(path).mp4")
-            shell("/usr/local/bin/ffmpeg -i \(path).mp4 -vcodec libx264 -crf 35 \(path).compressed.mp4")
-            shell("rm \(path).mp4")
-            
-            promise.success("\(movFilePath).compressed.mp4")
+            promise.success("\(tmpName).compressed.mp4")
         }
         
         return promise.future
