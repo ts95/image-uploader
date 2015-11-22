@@ -45,6 +45,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
+    var supportedExtensions = [".gif", ".jpeg", ".jpg", ".png", ".webm", ".mp4"]
+    
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         defaultIcon.template = true
         loadingIcon.template = false
@@ -52,7 +54,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         statusItem.image = defaultIcon
         statusItem.menu = statusMenu
         
-        statusItem.button?.window?.registerForDraggedTypes([NSFilenamesPboardType])
+        statusItem.button?.window?.registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType])
         statusItem.button!.window?.delegate = self
         
         detector.newFileCallback = { fileURL in
@@ -69,8 +71,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func performDragOperation(sender: NSDraggingInfo) -> Bool {
-        var supportedExtensions = [".gif", ".jpeg", ".jpg", ".png", ".webm", ".mp4"]
-        
         if hasFfmpeg() {
             supportedExtensions.append(".mov")
         }
@@ -78,10 +78,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let pasteboard = sender.draggingPasteboard()
         
         if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
-            if filenames.count > 1 {
-                return false
-            }
-            
             let filename = filenames[0]
             
             let isValid = supportedExtensions
@@ -89,10 +85,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 .count == 1
             
             if isValid && filename.hasSuffix(".mov") {
-                let url = NSURL(fileURLWithPath: filename, isDirectory: false)
+                let url = NSURL(fileURLWithPath: filename)
                 uploadImage(url, deleteFile: true)
             } else if isValid {
-                let url = NSURL(fileURLWithPath: filename, isDirectory: false)
+                let url = NSURL(fileURLWithPath: filename)
                 uploadImage(url)
             }
             
@@ -100,6 +96,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         return false
+    }
+    
+    @IBAction func uploadedFromClipboard(sender: NSMenuItem) {
+        let pasteboard = NSPasteboard.generalPasteboard()
+       
+        if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
+            let filename = filenames[0]
+            
+            let isValid = supportedExtensions
+                .filter { supportedExtension in filename.hasSuffix(supportedExtension) }
+                .count == 1
+            
+            if isValid {
+                let url = NSURL(fileURLWithPath: filename)
+                uploadImage(url)
+            }
+       }
     }
     
     @IBAction func quitClicked(sender: NSMenuItem) {
@@ -115,16 +128,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func uploadImage(url: NSURL, deleteFile: Bool = false) {
+        if !imageUploadEnabled {
+            return
+        }
+        
         if statusItem.image == loadingIcon {
             let notification = NSUserNotification()
             notification.title = "Image uploader"
             notification.informativeText = "An upload is already in progress. Wait for it to finish."
             notification.soundName = NSUserNotificationDefaultSoundName
             NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
-            return
-        }
-        
-        if !imageUploadEnabled {
             return
         }
         
@@ -161,7 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                         
                         let notification = NSUserNotification()
                         notification.title = "Image uploader"
-                        notification.informativeText = "An error ocurred when uploading the image."
+                        notification.informativeText = "An error ocurred while uploading the image."
                         notification.soundName = NSUserNotificationDefaultSoundName
                         NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
                     })
@@ -185,7 +198,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         Queue.global.async {
             let nMovFilePath = movFilePath.stringByReplacingOccurrencesOfString(" ", withString: "\\ ")
             let tmpName = NSString(string: "~/.\(NSDate().timeIntervalSince1970)").stringByStandardizingPath
-
+            
             shell("/usr/local/bin/ffmpeg -i \(nMovFilePath) -vcodec copy -acodec copy \(tmpName).mp4")
             shell("/usr/local/bin/ffmpeg -i \(tmpName).mp4 -vcodec libx264 -crf 35 \(tmpName).compressed.mp4")
             shell("rm \(tmpName).mp4")
