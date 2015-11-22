@@ -87,9 +87,11 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "Pods-Image uploaderTests/Alamofire.framework"
   install_framework "Pods-Image uploaderTests/BrightFutures.framework"
   install_framework "Pods-Image uploaderTests/Result.framework"
+  install_framework "Pods-Image uploaderTests/SwiftRegExp.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "Pods-Image uploaderTests/Alamofire.framework"
   install_framework "Pods-Image uploaderTests/BrightFutures.framework"
   install_framework "Pods-Image uploaderTests/Result.framework"
+  install_framework "Pods-Image uploaderTests/SwiftRegExp.framework"
 fi

@@ -15,5 +15,6 @@ target 'Image uploaderUITests' do
 
 end
 
-pod 'BrightFutures'
-pod 'Alamofire'
+pod 'BrightFutures', "~> 3.0"
+pod 'Alamofire', "~> 3.0"
+pod "SwiftRegExp", "~> 1.0"

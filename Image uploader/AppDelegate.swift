@@ -8,6 +8,8 @@
 
 import Cocoa
 import BrightFutures
+import Alamofire
+import SwiftRegExp
 
 func shell(input: String) -> (output: String, exitCode: Int32) {
     let task = NSTask()
@@ -58,8 +60,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         statusItem.image = defaultIcon
         statusItem.menu = statusMenu
         
-        statusItem.button?.window?.registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType])
-        statusItem.button!.window?.delegate = self
+        statusItem.button!.window!.registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType])
+        statusItem.button!.window!.delegate = self
         
         detector.newFileCallback = { fileURL in
             self.uploadImage(fileURL, deleteFile: true)
@@ -76,6 +78,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     func performDragOperation(sender: NSDraggingInfo) -> Bool {
         let pasteboard = sender.draggingPasteboard()
+        
+        if let urls = pasteboard.propertyListForType(NSURLPboardType) as? [String] {
+            let url = urls[0].stringByReplacingOccurrencesOfString("http://", withString: "https://")
+            let re = try! RegExp(pattern: "\\.[a-z]{3,4}$", options: NSRegularExpressionOptions.UseUnixLineSeparators)!
+            
+            if let ext = url =~ re {
+                if supportedExtensions.contains(ext) {
+                    let tmpName = NSString(string: "~/.\(NSDate().timeIntervalSince1970)\(ext)").stringByStandardizingPath
+                    
+                    Alamofire.request(.GET, url)
+                        .responseData { response in
+                            if let data = response.data {
+                                data.writeToFile(tmpName, atomically: false)
+                                let localURL = NSURL(fileURLWithPath: tmpName)
+                                self.uploadImage(localURL, deleteFile: true)
+                            }
+                        }
+                }
+            }
+        }
         
         if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
             let filename = filenames[0]
@@ -100,19 +122,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     @IBAction func uploadedFromClipboard(sender: NSMenuItem) {
         let pasteboard = NSPasteboard.generalPasteboard()
-       
-        if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
-            let filename = filenames[0]
-            
-            let isValid = supportedExtensions
-                .filter { supportedExtension in filename.hasSuffix(supportedExtension) }
-                .count == 1
-            
-            if isValid {
-                let url = NSURL(fileURLWithPath: filename)
-                uploadImage(url)
+        
+        if let images = pasteboard.readObjectsForClasses([NSImage.self], options: nil) {
+            if images.count == 0 {
+                return
             }
-       }
+            
+            let image = images[0]
+           
+            if let imgRep = image.representations[0] as? NSBitmapImageRep {
+                if let data = imgRep.representationUsingType(
+                    NSBitmapImageFileType.NSPNGFileType, properties: [:])
+                {
+                    let tmpName = NSString(string: "~/.\(NSDate().timeIntervalSince1970).png")
+                        .stringByStandardizingPath
+                    data.writeToFile(tmpName, atomically: false)
+                    
+                    uploadImage(NSURL(fileURLWithPath: tmpName), deleteFile: true)
+                }
+            }
+        }
     }
     
     @IBAction func quitClicked(sender: NSMenuItem) {

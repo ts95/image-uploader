@@ -39,10 +39,15 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>SwiftRegExp.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>2D4C77680FCA42FCF6E0F05C86C7C256</key>
+		<key>36EBDD844DAB24FCAE51C08C43B65498</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -52,7 +57,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>66A63BF310F070ED3E9BDCDD4E125A03</key>
+		<key>5081E69AF132FF2B08FF6B4BB0613E1C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -62,12 +67,17 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>81E0F39C7234EC0CC90520C0F9A47434</key>
+		<key>9E4005CD3781468FA2C8EADF9ABE6C2F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>A2CA547B1C88B56F300B47CD8DE3B561</key>
+		<key>9ECF7C3E3D763A92D40DBA75E426022A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C8DB278EDF5F9227F41C13ECECA0502A</key>
 		<dict>
 			<key>primary</key>
 			<true/>

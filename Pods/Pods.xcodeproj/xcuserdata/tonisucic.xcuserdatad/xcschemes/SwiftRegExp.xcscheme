@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '7CB7E15AD0CE5339DC599CAE'
-               BlueprintName = 'Pods-Image uploader'
+               BlueprintIdentifier = '3E6C0FD43BF4A6F4970C290F'
+               BlueprintName = 'SwiftRegExp'
                ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'Pods_Image_uploader.framework'>
+               BuildableName = 'SwiftRegExp.framework'>
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
