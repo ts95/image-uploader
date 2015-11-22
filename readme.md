@@ -2,7 +2,7 @@ Image uploader
 ========
 A simple image uploading client for OS X. Upload target:  [img-service](https://github.com/ts95/img-service).
 
-![Image uploader Status Menu](https://img.tonisucic.com/i/Z1qFbl6.png)
+![Image uploader Status Menu](https://img.tonisucic.com/i/1E1BYm.png)
 
 ### Features
 * Automatic upload of images taken with the OS X snipping tool (shift+cmd+3 & shift+cmd+4)
