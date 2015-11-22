@@ -48,6 +48,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var supportedExtensions = [".gif", ".jpeg", ".jpg", ".png", ".webm", ".mp4"]
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
+        if hasFfmpeg() {
+            supportedExtensions.append(".mov")
+        }
+        
         defaultIcon.template = true
         loadingIcon.template = false
         
@@ -71,10 +75,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func performDragOperation(sender: NSDraggingInfo) -> Bool {
-        if hasFfmpeg() {
-            supportedExtensions.append(".mov")
-        }
-        
         let pasteboard = sender.draggingPasteboard()
         
         if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
