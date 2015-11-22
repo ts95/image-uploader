@@ -79,6 +79,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func performDragOperation(sender: NSDraggingInfo) -> Bool {
         let pasteboard = sender.draggingPasteboard()
         
+        if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
+            let filename = filenames[0]
+            
+            let isValid = supportedExtensions
+                .filter { supportedExtension in filename.hasSuffix(supportedExtension) }
+                .count == 1
+            
+            if isValid && filename.hasSuffix(".mov") {
+                let url = NSURL(fileURLWithPath: filename)
+                uploadImage(url, deleteFile: true)
+            } else if isValid {
+                let url = NSURL(fileURLWithPath: filename)
+                uploadImage(url)
+            }
+            
+            return isValid
+        }
+        
         if let urls = pasteboard.propertyListForType(NSURLPboardType) as? [String] {
             let url = urls[0].stringByReplacingOccurrencesOfString("http://", withString: "https://")
             let re = try! RegExp(pattern: "\\.[a-z]{3,4}$", options: NSRegularExpressionOptions.UseUnixLineSeparators)!
@@ -97,24 +115,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                         }
                 }
             }
-        }
-        
-        if let filenames = pasteboard.propertyListForType(NSFilenamesPboardType) as? [String] {
-            let filename = filenames[0]
-            
-            let isValid = supportedExtensions
-                .filter { supportedExtension in filename.hasSuffix(supportedExtension) }
-                .count == 1
-            
-            if isValid && filename.hasSuffix(".mov") {
-                let url = NSURL(fileURLWithPath: filename)
-                uploadImage(url, deleteFile: true)
-            } else if isValid {
-                let url = NSURL(fileURLWithPath: filename)
-                uploadImage(url)
-            }
-            
-            return isValid
         }
         
         return false
