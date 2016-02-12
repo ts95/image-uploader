@@ -48,8 +48,6 @@ class ScreenshotDetector: NSObject, NSMetadataQueryDelegate {
                                 var lastModified: AnyObject?
                                 _ = try? url.getResourceValue(&lastModified, forKey: NSURLContentModificationDateKey)
                                 let diff = now.timeIntervalSince1970 - lastModified!.timeIntervalSince1970
-                                print(diff)
-                                print(filename)
                                 if diff < 4 {
                                     cb(fileURL: url)
                                 }

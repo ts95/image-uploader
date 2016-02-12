@@ -180,9 +180,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         } else {
             urlFuture = Future<NSURL, NoError>(value: url)
         }
-
+        
         urlFuture
             .onSuccess(callback: { uploadURL in
+                print(uploadURL)
                 self.uploader.uploadFile(uploadURL)
                     .onSuccess(callback: { linkToImage in
                         if deleteFile {
@@ -232,7 +233,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             shell("/usr/local/bin/ffmpeg -i \(tmpName).mp4 -vcodec libx264 -crf 30 \(tmpName).compressed.mp4")
             shell("rm \(tmpName).mp4")
 
-            promise.success("\(tmpName).compressed.mp4")
+            shell("mv \(tmpName).compressed.mp4 \(nMovFilePath.stringByReplacingOccurrencesOfString(".mov", withString: ".mp4"))")
+
+            promise.success(movFilePath.stringByReplacingOccurrencesOfString(".mov", withString: ".mp4"))
         }
 
         return promise.future
